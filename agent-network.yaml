@@ -1,0 +1,174 @@
+schemaVersion: 1.0.0
+label: UCSF Demo onboarding Agent Network 
+brokers:
+  demo-ucsf-onboarding-agent-broker:
+    card:
+      protocolVersion: 0.3.0
+      name: UCSF Demo onboarding Agent Broker
+      description: This is a Demo Agent Broker for onboarding.
+      url: ${ingressgw.url}/demo-ucsf-onboarding-agent-broker
+      capabilities:
+        pushNotifications: true
+      version: 1.0.0
+      securitySchemes: {}
+      defaultInputModes:
+        - application/json
+        - text/plain      
+      defaultOutputModes:
+        - application/json
+      skills:
+        - id: demo-ucsf-onboarding-agent
+          name: UCSF Demo onboarding Agent
+          description: This agent acts as a broker, orchestrating the use of various specialized tools and agents (including MCP) to effectively manage customer onboarding.
+          examples:
+            -  Onboard a new customer. Their name is 'Alex Smith', email is 'alex.smith@example.com', and phone number is '555-123-4567'
+          inputModes:
+            - application/json
+            - text/plain      
+          outputModes:
+            - application/json
+            - text/plain
+          tags: [UCSF-demo-onboarding-agent]
+    spec:
+      llm:
+        ref:
+          name: ITS-OpenAI
+        configuration:
+          model: gpt-5-mini
+      instructions:
+        - |
+            You are the Customer Onboarding Orchestrator. Coordinate onboarding of a new customer across the systems needed for day-to-day work.
+              ## The process for onboarding an customer is:
+            - Onboard in Workday :Create the new-hire record. Fetch the address using available tools and do not ask for it unless you are not sure how to get it. 
+            - Onboard in Salesforce: create the customer's CRM profile in Salesforce. 
+            {
+            "message": "Workday and Salesforce onboarding completed and working on next steps....",
+            "contextId": "<fetch-the-context-id-from-input>"
+            }
+            - Request customer laptop: submit a laptop request in Zendesk. 
+            - Request customer badge: initiate the customer badge request.
+            {
+            "message": "Zendesk and Badge onboarding completed and working on next steps....",
+            "contextId": "<fetch-the-context-id-from-input>"
+            }
+            - IT system setup: provision the ping id system for the customer.
+            ## Final Response 
+            - Return a plain-text human readable summary of the actions taken representing all the steps not just the final step. Format it using bullet points. DO NOT include any tool name in the summary
+      links:
+        - agent:
+            ref:
+              name: customer-workday-agent
+        - agent:
+            ref:
+              name: customer-badging-agent
+        - agent:
+            ref:
+              name: customer-salesforce-agent
+        - agent:
+            ref:
+              name: customer-zendesk-agent
+        - agent:
+            ref:
+              name: customer-it-agent
+      tools:
+        - mcp:
+            ref:
+              name: customer-talent-pool-mcp
+            allowed:
+                - TalentPoolMcpServer.match_email_to_address
+agents:
+  customer-workday-agent:
+      label: Customer Workday Agent
+      metadata:
+          protocol: a2a
+          platform: Workday
+  customer-badging-agent:
+      label: Customer Badging Agent
+      metadata:
+          protocol: a2a
+          platform: badging
+  customer-salesforce-agent:
+      label: Customer Salesforce Agent
+      metadata:
+          protocol: a2a
+          platform: Salesforce
+  customer-zendesk-agent:
+      label: Customer Zendesk Agent
+      metadata:
+          protocol: a2a
+          platform: Zendesk
+  customer-it-agent:
+      label: Customer IT Agent
+      metadata:
+          protocol: a2a
+          platform: IT
+mcpServers:
+  customer-talent-pool-mcp:
+      label: Customer Talent Pool MCP Server
+      metadata:
+          transport:
+              kind: streamableHttp
+              path: /mcp        
+llmProviders:
+  ITS-OpenAI:
+    label: ITSOpenAI
+    description: ITS Open AI LLM Provider
+    metadata:
+      platform: OpenAI
+      models: 
+        - gpt-5-mini     
+connections:
+  customer-workday-agent:
+    kind: agent
+    ref:
+      name: customer-workday-agent
+    spec:
+      url: ${customer-workday-agent.url}
+  customer-badging-agent:
+    kind: agent
+    ref:
+      name: customer-badging-agent
+    spec:
+      url: ${customer-badging-agent.url}
+  customer-salesforce-agent:
+    kind: agent
+    ref:
+      name: customer-salesforce-agent
+    spec:
+      url: ${customer-salesforce-agent.url}
+  customer-zendesk-agent:
+    kind: agent
+    ref:
+      name: customer-zendesk-agent
+    spec:
+      url: ${customer-zendesk-agent.url}
+  customer-it-agent:
+    kind: agent
+    ref:
+      name: customer-it-agent
+    spec:
+      url: ${customer-it-agent.url}
+  customer-talent-pool-mcp:
+    kind: mcp
+    ref:
+      name: customer-talent-pool-mcp
+    spec:
+      url: ${customer-talent-pool-mcp.url}
+  my-open-ai-connection:
+    kind: llm
+    ref:
+      name: ITS-OpenAI
+    spec:
+      url: ${itsopenai.url}
+      configuration:
+        apiKey: ${itsopenai.apiKey}
+        timeout: 600000
+        policies:
+            -
+              ref:
+                name: credential-injection-api-key
+                namespace: 68ef9520-24e9-4cf2-b2f5-620025690913
+              configuration:
+                authType: apiKey
+                overwrite: true
+                customHeader: api-key
