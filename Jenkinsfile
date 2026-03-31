@@ -83,12 +83,12 @@ pipeline {
 
     stages {
        
-       stage('Install Dependencies') {
-        steps {
-            // We use -y to auto-confirm the installation
-            sh 'sudo apt-get update && sudo apt-get install -y libatomic1'
-        }
-}
+    //    stage('Install Dependencies') {
+    //     steps {
+    //         // We use -y to auto-confirm the installation
+    //         sh 'sudo apt-get update && sudo apt-get install -y libatomic1'
+    //         }
+    //     }
       
        stage('Setup Environment') {
             steps {
