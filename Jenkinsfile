@@ -37,9 +37,10 @@ void deploySteps() {
    		
     withCredentials([
         // string(credentialsId: "${ENV}-${APP_NAME}-secure.key", variable: 'SECURE_KEY'),
-        string(credentialsId: "${ENV}-splunk_token", variable: 'SPLUNK_TOKEN'),
-        usernamePassword(credentialsId: "${ENV}-anypointplatform-connected-app", usernameVariable: 'AP_CA_CLIENT_ID', passwordVariable: 'AP_CA_CLIENT_SECRET'),
-        usernamePassword(credentialsId: "${ENV}-anypoint.platform.credential", usernameVariable: 'ANYPOINT_PLATFORM_CLIENT_ID', passwordVariable: 'ANYPOINT_PLATFORM_CLIENT_SECRET')
+        //string(credentialsId: "${ENV}-splunk_token", variable: 'SPLUNK_TOKEN'),
+        
+        //usernamePassword(credentialsId: "${ENV}-anypoint.platform.credential", usernameVariable: 'ANYPOINT_PLATFORM_CLIENT_ID', passwordVariable: 'ANYPOINT_PLATFORM_CLIENT_SECRET'),
+        usernamePassword(credentialsId: "${ENV}-anypointplatform-connected-app", usernameVariable: 'AP_CA_CLIENT_ID', passwordVariable: 'AP_CA_CLIENT_SECRET')
     ]) {
         // sh 'mvn clean deploy -P $ENV -DskipMunitTests -DmuleDeploy -Dapp.name=$APP_NAME_DEPLOYMENT -Denvironment=$deployENV -Dworkers=$noOfWorkers -DworkerType=$workerType'
 
