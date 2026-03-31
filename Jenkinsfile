@@ -26,33 +26,34 @@ void buildSteps() {
 void deploySteps() {
    	env.deployENV = (ENV=='prod') ? 'Production' : ENV
    		
-   	properties = readProperties file: "/opt/properties/apps/ITS/${APP_NAME.toUpperCase()}/${ENV}_env.properties"
-   	env.noOfWorkers = "${properties.no_of_worker}"
-   	env.workerType = "${properties.worker_type}"
-   	env.ENV_ID = "${properties.env_id}"
-   	env.batch_size_count="${properties.batch_size_count}"
-    env.batch_interval="${properties.batch_interval}"
-    env.batch_size_bytes="${properties.batch_size_bytes}"
+   	// properties = readProperties file: "/opt/properties/apps/ITS/${APP_NAME.toUpperCase()}/${ENV}_env.properties"
+   	// env.noOfWorkers = "${properties.no_of_worker}"
+   	// env.workerType = "${properties.worker_type}"
+   	// env.ENV_ID = "${properties.env_id}"
+   	// env.batch_size_count="${properties.batch_size_count}"
+    // env.batch_interval="${properties.batch_interval}"
+    // env.batch_size_bytes="${properties.batch_size_bytes}"
          
    		
-    withCredentials([string(credentialsId: "${ENV}-${APP_NAME}-secure.key", variable: 'SECURE_KEY'),
+    withCredentials([
+        // string(credentialsId: "${ENV}-${APP_NAME}-secure.key", variable: 'SECURE_KEY'),
         string(credentialsId: "${ENV}-splunk_token", variable: 'SPLUNK_TOKEN'),
         usernamePassword(credentialsId: "${ENV}-anypointplatform-connected-app", usernameVariable: 'AP_CA_CLIENT_ID', passwordVariable: 'AP_CA_CLIENT_SECRET'),
         usernamePassword(credentialsId: "${ENV}-anypoint.platform.credential", usernameVariable: 'ANYPOINT_PLATFORM_CLIENT_ID', passwordVariable: 'ANYPOINT_PLATFORM_CLIENT_SECRET')
     ]) {
         // sh 'mvn clean deploy -P $ENV -DskipMunitTests -DmuleDeploy -Dapp.name=$APP_NAME_DEPLOYMENT -Denvironment=$deployENV -Dworkers=$noOfWorkers -DworkerType=$workerType'
 
-        echo "Running build with clientId ${ANYPOINT_PLATFORM_CLIENT_ID} and clientSecret ${ANYPOINT_PLATFORM_CLIENT_SECRET} "
+        echo "Running build with clientId ${AP_CA_CLIENT_ID}"
 
         sh '''
-           npx anypoint-cli-agent-fabric-plugin conf client_id $ANYPOINT_PLATFORM_CLIENT_ID
-           npx anypoint-cli-agent-fabric-plugin conf client_secret $ANYPOINT_PLATFORM_CLIENT_SECRET
-           npx anypoint-cli-agent-fabric-plugin conf organization "5a20037b-6851-45f2-9300-392ccb77216a"
-           npx anypoint-cli-agent-fabric-plugin agent-network project build
+           npx anypoint-cli-agent-fabric-plugin conf client_id $AP_CA_CLIENT_ID
+           npx anypoint-cli-agent-fabric-plugin conf client_secret $AP_CA_CLIENT_SECRET
+           npx anypoint-cli-agent-fabric-plugin conf organization ${ORG_ID}
+           npx anypoint-cli-agent-fabric-plugin agent-network project build --client_id $AP_CA_CLIENT_ID --client_secret $AP_CA_CLIENT_SECRET --organization ${ORG_ID}
            
-           npx anypoint-cli-agent-fabric-plugin agent-network project publish
+           npx anypoint-cli-agent-fabric-plugin agent-network project publish --client_id $AP_CA_CLIENT_ID --client_secret $AP_CA_CLIENT_SECRET --organization ${ORG_ID}
            
-           npx anypoint-cli-agent-fabric-plugin agent-network project deploy --environment ${ENV} --target-space ${target_space} --ingress-gw ucsf-small-ingress-gw --egress-gw ucsf-large-egress-gw --organization 5a20037b-6851-45f2-9300-392ccb77216a
+           npx anypoint-cli-agent-fabric-plugin agent-network project deploy --environment ${ENV} --target-space ${target_space} --ingress-gw its-small-ingress-gw --egress-gw its-large-egress-gw --client_id $AP_CA_CLIENT_ID --client_secret $AP_CA_CLIENT_SECRET --organization ${ORG_ID}
 
         '''
     }
@@ -62,18 +63,21 @@ pipeline {
     agent any
     environment {
         APP_NAME = 'its-agentfabric-prototype'
+        ORG_ID = 'fd48cc65-d939-425c-a990-099a23d246ae'
         min = 8081
         max = 40000
         random_port = "${(int)(Math.random() * (max - min) + 1) + min}"
 
          // Node.js and npm configuration
-        NODE_VERSION = '18.x'
+        // NODE_VERSION = '18.x'
+        // NODE_VERSION = 'Node-18'
+        NODE_VERSION = 'Node-25'
         NPM_REGISTRY = 'https://registry.npmjs.org/'
     }
 
     tools {
-        // nodejs "${NODE_VERSION}"
-        node "${NODE_VERSION}"
+        nodejs "${NODE_VERSION}"
+        //node "${NODE_VERSION}"
     }
 
     stages {
@@ -101,13 +105,10 @@ pipeline {
                 echo 'Installing MuleSoft Anypoint CLI Agent Fabric Plugin...'
                 sh '''
                     # Install the Agent Fabric plugin globally
-                    npm install -g @mulesoft/anypoint-cli-agent-fabric-plugin
-                    
-                    # Verify installation
-                    npm list -g @mulesoft/anypoint-cli-agent-fabric-plugin
+                    npm i mulesoft-anypoint-cli-agent-fabric-plugin
                     
                     # Check available commands
-                    npx anypoint-cli-agent-fabric-plugin --help
+                    npx mulesoft-anypoint-cli-agent-fabric-plugin --help
                 '''
             }
         }
@@ -140,7 +141,7 @@ pipeline {
                 target_space = 'UCSF-NONPROD'
             }
             steps {
-                sh 'cp -f dev/exchange.json ./'
+                sh 'cp -f resources/dev/exchange.json ./'
                 // buildSteps()
             }
  
@@ -156,7 +157,7 @@ pipeline {
                 target_space = 'UCSF-NONPROD'
             }
             steps {
-                sh 'cp -f stage/exchange.json ./'
+                sh 'cp -f resources/stage/exchange.json ./'
                 buildSteps()
             }
  
@@ -172,7 +173,7 @@ pipeline {
                 target_space = 'UCSF-PROD'
             }
             steps {
-                sh 'cp -f prod/exchange.json ./'
+                sh 'cp -f resources/prod/exchange.json ./'
                 buildSteps()
             }
  

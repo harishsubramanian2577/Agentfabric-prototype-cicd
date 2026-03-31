@@ -2,7 +2,7 @@
   "main": "agent-network.yaml",
   "name": "Demo UCSF Onboarding Agent",
   "classifier": "agent-network",
-  "organizationId": "5a20037b-6851-45f2-9300-392ccb77216a",
+  "organizationId": "d48cc65-d939-425c-a990-099a23d246ae",
   "descriptorVersion": "1.0.0",
   "tags": ["UCSF-demo-onboarding-agent"],
   "metadata": {
@@ -52,7 +52,7 @@
       "itsopenai": {
         "url": {
           "description": "ITS-OpenAI URL",
-          "default": "https://dev-unified-api.ucsf.edu/general/openai/v1/chat/completions",
+          "default": "https://dev-unified-api.ucsf.edu/general/openai/v1/",
           "secret": false
         },
         "apiKey": {
@@ -68,7 +68,7 @@
     }
   },
   "dependencies": [],
-  "groupId": "5a20037b-6851-45f2-9300-392ccb77216a",
+  "groupId": "d48cc65-d939-425c-a990-099a23d246ae",
   "assetId": "demo-ucsf-onboarding-agent",
-  "version": "1.0.12"
+  "version": "1.1.2"
 }

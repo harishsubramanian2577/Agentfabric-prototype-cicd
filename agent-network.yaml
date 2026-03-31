@@ -34,7 +34,7 @@ brokers:
         ref:
           name: ITS-OpenAI
         configuration:
-          model: gpt-5-mini
+          model: ${itsopenai.modelName}
       instructions:
         - |
             You are the Customer Onboarding Orchestrator. Coordinate onboarding of a new customer across the systems needed for day-to-day work.
@@ -115,8 +115,8 @@ llmProviders:
     description: ITS Open AI LLM Provider
     metadata:
       platform: OpenAI
-      models: 
-        - gpt-5-mini     
+      models:
+        - ${itsopenai.modelName}
 connections:
   customer-workday-agent:
     kind: agent
@@ -163,12 +163,3 @@ connections:
       configuration:
         apiKey: ${itsopenai.apiKey}
         timeout: 600000
-        policies:
-            -
-              ref:
-                name: credential-injection-api-key
-                namespace: 68ef9520-24e9-4cf2-b2f5-620025690913
-              configuration:
-                authType: apiKey
-                overwrite: true
-                customHeader: api-key
