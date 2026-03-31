@@ -141,7 +141,8 @@ pipeline {
         stage('DEV Build') {
             when {
                 expression {
-                    env.GIT_BRANCH == "DEV"
+                    // env.GIT_BRANCH == "DEV"
+                    env.GIT_BRANCH == "feature-prototype"
                 }
             }
             environment {
@@ -152,7 +153,6 @@ pipeline {
                 sh 'cp -f resources/dev/exchange.json ./'
                 // buildSteps()
             }
- 
         }
         stage('STAGE Build') {
             when {
