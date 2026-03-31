@@ -64,7 +64,7 @@ pipeline {
     agent any
     environment {
         APP_NAME = 'its-agentfabric-prototype'
-        ORG_ID = 'fd48cc65-d939-425c-a990-099a23d246ae'
+        ORG_ID = 'd48cc65-d939-425c-a990-099a23d246ae'
         min = 8081
         max = 40000
         random_port = "${(int)(Math.random() * (max - min) + 1) + min}"
