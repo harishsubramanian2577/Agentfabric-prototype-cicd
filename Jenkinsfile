@@ -54,8 +54,23 @@ void deploySteps() {
            
            npx anypoint-cli-agent-fabric-plugin agent-network project publish --client_id $AP_CA_CLIENT_ID --client_secret $AP_CA_CLIENT_SECRET --organization ${ORG_ID}
            
-           npx anypoint-cli-agent-fabric-plugin agent-network project deploy --environment ${ENV} --target-space ${target_space} --ingress-gw its-small-ingress-gw --egress-gw its-large-egress-gw --client_id $AP_CA_CLIENT_ID --client_secret $AP_CA_CLIENT_SECRET --organization ${ORG_ID}
-
+           npx anypoint-cli-agent-fabric-plugin agent-network project deploy \
+               --environment ${ENV} \
+               --target-space ${target_space} \
+               --ingress-gw its-small-ingress-gw \
+               --egress-gw its-large-egress-gw \
+               --client_id $AP_CA_CLIENT_ID \
+               --client_secret $AP_CA_CLIENT_SECRET \
+               --organization ${ORG_ID} \
+               --property customer-workday-agent.url:${customer_workday_agent_url} \
+               --property customer-badging-agent.url:${customer_badging_agent_url} \
+               --property customer-salesforce-agent.url:${customer_salesforce_agent_url} \
+               --property customer-zendesk-agent.url:${customer_zendesk_agent_url} \
+               --property customer-it-agent.url:${customer_itagent_agent_url} \
+               --property customer-talent-pool-mcp.url:${customer_talent_pool_mcp_url} \
+               --property itsopenai.modelName:${itsopenai_modelName} \
+               --property itsopenai.url:${itsopenai_url} \
+               --property itsopenai.apiKey:${itsopenai_apiKey}
         '''
     }
 }
@@ -65,6 +80,17 @@ pipeline {
     environment {
         APP_NAME = 'its-agentfabric-prototype'
         ORG_ID = 'fd48cc65-d939-425c-a990-099a23d246ae'
+
+        customer_workday_agent_url = 'https://workday-agent-v1-2p52mj.5sc6y6-4.usa-e2.cloudhub.io/workday-agent/'
+        customer_badging_agent_url = 'https://badging-agent-v1-2p52mj.5sc6y6-4.usa-e2.cloudhub.io/badge-agent/'
+        customer_salesforce_agent_url = 'https://salesforce-agent-v1-2p52mj.5sc6y6-2.usa-e2.cloudhub.io/salesforce-agent/'
+        customer_zendesk_agent_url = 'https://zendesk-agent-v1-2p52mj.5sc6y6-3.usa-e2.cloudhub.io/zendesk/'
+        customer_itagent_agent_url = 'https://it-agent-v1-2p52mj.5sc6y6-4.usa-e2.cloudhub.io/pingid/'
+        customer_talent_pool_mcp_url = 'https://talent-pool-arvldt.5sc6y6-3.usa-e2.cloudhub.io/'
+        itsopenai_modelName= 'gpt-5-mini'
+        itsopenai_url = 'https://dev-unified-api.ucsf.edu/general/openai/v1/'
+        itsopenai_apiKey = 'sadfsafasf'
+
         min = 8081
         max = 40000
         random_port = "${(int)(Math.random() * (max - min) + 1) + min}"
