@@ -2,7 +2,7 @@
   "main": "agent-network.yaml",
   "name": "Demo UCSF Onboarding Agent",
   "classifier": "agent-network",
-  "organizationId": "d48cc65-d939-425c-a990-099a23d246ae",
+  "organizationId": "fd48cc65-d939-425c-a990-099a23d246ae",
   "descriptorVersion": "1.0.0",
   "tags": ["UCSF-demo-onboarding-agent"],
   "metadata": {
@@ -68,7 +68,7 @@
     }
   },
   "dependencies": [],
-  "groupId": "d48cc65-d939-425c-a990-099a23d246ae",
+  "groupId": "fd48cc65-d939-425c-a990-099a23d246ae",
   "assetId": "demo-ucsf-onboarding-agent",
   "version": "1.1.2"
 }
