@@ -158,6 +158,8 @@ void injectDependencyAndUploadJar() {
             cd target/broker-mule-app 
             
             ls -latr
+            
+            pwd
          '''
         
         echo "On target folder.."
@@ -345,7 +347,7 @@ void modifyDeploySteps() {
 pipeline {
     agent any
     environment {
-        APP_NAME = 'its-agentfabric-prototype'
+        APP_NAME = 'its-agentfabrics-prototype'
         ORG_ID = 'a19065cb-4dd4-4916-9401-bb64b169742c'
         ASSET_ID = ''
 
