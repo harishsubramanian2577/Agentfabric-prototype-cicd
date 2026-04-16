@@ -454,8 +454,9 @@ pipeline {
                 }
             }
             environment {
-                ENV = 'dev'
+                //ENV = 'dev'
                 //ENV = 'DEV'
+                ENV = 'Dev'
                 target_space = 'HarishNewPS1'
                 ENV_ID = '2e16bf69-7e76-4387-ad51-1fdd939b4d86'
             }
@@ -506,8 +507,9 @@ pipeline {
                 }
             }
             environment {
-                ENV = 'dev'
+                //ENV = 'dev'
                 //ENV = 'DEV'
+                ENV = 'Dev'
                 APP_NAME_DEPLOYMENT = "${ENV}-${APP_NAME}"
                 BROKER_APP_LOCATION = "${APP_LOCATION}/branches/${ENV}/workspace/target/broker-mule-app"
                 target_space = 'HarishNewPS1'
