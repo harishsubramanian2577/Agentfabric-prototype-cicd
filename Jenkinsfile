@@ -510,7 +510,7 @@ pipeline {
                 ENV = 'DEV'
                 APP_NAME_DEPLOYMENT = "${ENV}-${APP_NAME}"
                 BROKER_APP_LOCATION = "${APP_LOCATION}/branches/${ENV}/workspace/target/broker-mule-app"
-                target_space = 'TEST-NONPROD'
+                target_space = 'HarishNewPS1'
             }
             steps {
                 deploySteps()
@@ -528,7 +528,7 @@ pipeline {
                 ENV = 'stage'
                 APP_NAME_DEPLOYMENT = "${ENV}-${APP_NAME}"
                 BROKER_APP_LOCATION = "${APP_LOCATION}/branches/${ENV}/workspace/target/broker-mule-app"
-                target_space = 'TEST-NONPROD'
+                target_space = 'HarishNewPS1'
             }
             steps {
                 deploySteps()
