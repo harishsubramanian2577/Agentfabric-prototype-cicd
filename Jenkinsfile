@@ -431,7 +431,7 @@ pipeline {
             }
             steps {
                 sh 'cp -f resources/dev/exchange.json ./'
-                buildSteps()
+                //buildSteps()
                 buildSteps2()
             }
         }
@@ -448,7 +448,7 @@ pipeline {
             }
             steps {
                 sh 'cp -f resources/stage/exchange.json ./'
-                buildSteps()
+               //buildSteps()
                 buildSteps2()
             }
         }
@@ -465,7 +465,7 @@ pipeline {
             }
             steps {
                 sh 'cp -f resources/prod/exchange.json ./'
-                buildSteps()
+                //buildSteps()
                 buildSteps2()
             }
         }
