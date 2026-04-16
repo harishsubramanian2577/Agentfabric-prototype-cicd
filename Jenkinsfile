@@ -28,6 +28,7 @@ void buildSteps2(){
             npx anypoint-cli-agent-fabric-plugin conf organization ${ORG_ID}
             npx anypoint-cli-agent-fabric-plugin agent-network project build --client_id $AP_CA_CLIENT_ID --client_secret $AP_CA_CLIENT_SECRET --organization ${ORG_ID}
         '''
+        echo "Build Comppleted"
     }
 }
  
@@ -343,7 +344,7 @@ pipeline {
     agent any
     environment {
         APP_NAME = 'its-agentfabric-prototype'
-        ORG_ID = 'fd48cc65-d939-425c-a990-099a23d246ae'
+        ORG_ID = 'a19065cb-4dd4-4916-9401-bb64b169742c'
         ASSET_ID = ''
 
         APP_LOCATION = "/home/cdelivery/.jenkins/jobs/${APP_NAME}"
@@ -427,7 +428,7 @@ pipeline {
             environment {
                 ENV = 'dev'
                 target_space = 'HarishNewPS1'
-                ENV_ID = 'a4bc7f3d-b8a5-4ec5-996c-1a7ed5c7e493'
+                ENV_ID = '2e16bf69-7e76-4387-ad51-1fdd939b4d86'
             }
             steps {
                 sh 'cp -f resources/dev/exchange.json ./'
