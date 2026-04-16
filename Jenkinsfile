@@ -93,8 +93,8 @@ void deploySteps() {
         def deployCommand = "npx anypoint-cli-agent-fabric-plugin agent-network project deploy \
             --environment ${ENV} \
             --target-space ${target_space} \
-            --ingress-gw its-small-ingress-gw \
-            --egress-gw its-large-egress-gw \
+            --ingress-gw agent-network-ingress-gw \
+            --egress-gw agent-network-egress-gw \
             --client_id $AP_CA_CLIENT_ID \
             --client_secret $AP_CA_CLIENT_SECRET \
             --organization ${ORG_ID} \
