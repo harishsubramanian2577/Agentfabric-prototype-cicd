@@ -56,6 +56,8 @@ void deploySteps() {
 
         def exchangeFile = "exchange.json"
 
+        sh 'jq --version'
+
         // Generate property arguments from exchange.json
         def propertyArgs = sh(
             script: """
@@ -356,6 +358,10 @@ pipeline {
         // Node.js and npm configuration
         NODE_VERSION = 'Node-25'
         NPM_REGISTRY = 'https://registry.npmjs.org/'
+
+        // This adds the current workspace directory to the PATH 
+        // so 'jq' can be found like a system command
+        PATH = "${WORKSPACE}:${env.PATH}"
     }
 
     tools {
