@@ -116,7 +116,7 @@ void injectDependencyAndUploadJar() {
     ]) {
         //reading agentic-parent-pom dependency
         // 1. Define the assetId we are looking for
-        def targetAssetId = "its-agentic-parent-pom"
+        def targetAssetId = "org-agentic-parent-pom"
         // 2. Use jq to filter the dependencies array and return a raw string
         // -r ensures raw output (no quotes around the strings)
         // We fetch the groupId, assetId, and version separated by spaces
