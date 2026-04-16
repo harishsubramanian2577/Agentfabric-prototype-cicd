@@ -21,12 +21,16 @@ void buildSteps2(){
         usernamePassword(credentialsId: "${ENV}-anypointplatform-connected-app", usernameVariable: 'AP_CA_CLIENT_ID', passwordVariable: 'AP_CA_CLIENT_SECRET')
     ]) 
     {
+        // sh 'mvn clean deploy -P $ENV -DskipMunitTests -DmuleDeploy -Dapp.name=$APP_NAME_DEPLOYMENT -Denvironment=$deployENV -Dworkers=$noOfWorkers -DworkerType=$workerType'
+
         echo "Running build with clientId ${AP_CA_CLIENT_ID}"
+
         sh '''
-            npx anypoint-cli-agent-fabric-plugin conf client_id $AP_CA_CLIENT_ID
-            npx anypoint-cli-agent-fabric-plugin conf client_secret $AP_CA_CLIENT_SECRET
-            npx anypoint-cli-agent-fabric-plugin conf organization ${ORG_ID}
-            npx anypoint-cli-agent-fabric-plugin agent-network project build --client_id $AP_CA_CLIENT_ID --client_secret $AP_CA_CLIENT_SECRET --organization ${ORG_ID}
+        npx anypoint-cli-agent-fabric-plugin conf client_id $AP_CA_CLIENT_ID
+        npx anypoint-cli-agent-fabric-plugin conf client_secret $AP_CA_CLIENT_SECRET
+        npx anypoint-cli-agent-fabric-plugin conf organization ${ORG_ID}
+        npx anypoint-cli-agent-fabric-plugin agent-network project build --client_id $AP_CA_CLIENT_ID --client_secret $AP_CA_CLIENT_SECRET --organization ${ORG_ID}
+        
         '''
     }
 }
@@ -44,7 +48,12 @@ void deploySteps() {
          
    		
     withCredentials([
+        // string(credentialsId: "${ENV}-${APP_NAME}-secure.key", variable: 'SECURE_KEY'),
+        string(credentialsId: "${ENV}-splunk_token", variable: 'SPLUNK_TOKEN'),
+        
+        //usernamePassword(credentialsId: "${ENV}-anypoint.platform.credential", usernameVariable: 'ANYPOINT_PLATFORM_CLIENT_ID', passwordVariable: 'ANYPOINT_PLATFORM_CLIENT_SECRET'),
         //string(credentialsId: "${ENV}-openai-key", variable: 'API_KEY'),
+        usernamePassword(credentialsId: "${ENV}-anypointmq.credential", usernameVariable: 'ANYPOINTMQ_CLIENT_ID', passwordVariable: 'ANYPOINTMQ_CLIENT_SECRET'),
         usernamePassword(credentialsId: "${ENV}-anypointplatform-connected-app", usernameVariable: 'AP_CA_CLIENT_ID', passwordVariable: 'AP_CA_CLIENT_SECRET')
     ]) {
         echo "Running build with clientId ${AP_CA_CLIENT_ID}" 
@@ -55,7 +64,7 @@ void deploySteps() {
 
         def exchangeFile = "exchange.json"
 
-        // Generate property arguments from exchange.json
+         // Generate property arguments from exchange.json
         def propertyArgs = sh(
             script: """
                 jq -r '
@@ -81,7 +90,7 @@ void deploySteps() {
         echo "Version: ${APP_VERSION}"
 
          // Extract version using jq
-        ASSET_ID = sh(
+        def ASSET_ID = sh(
             script: "jq -r '.assetId' ${exchangeFile}",
             returnStdout: true
         ).trim()
@@ -100,104 +109,30 @@ void deploySteps() {
         
         echo "Deploy args: ${deployCommand}"
         echo "Executing Deploy Command..." 
+        // DEPLOY COMMENTED: TODO: TO ADD LATER
         sh deployCommand
-        echo "Deployment completed for Agent Broker..." 
-    }
-}
 
-
-void injectDependencyAndUploadJar() {
-   	env.deployENV = (ENV=='prod') ? 'Production' : ENV
-    withCredentials([
-        usernamePassword(credentialsId: "${ENV}-anypointplatform-connected-app", usernameVariable: 'AP_CA_CLIENT_ID', passwordVariable: 'AP_CA_CLIENT_SECRET')
-    ]) {
-        //reading agentic-parent-pom dependency
-        // 1. Define the assetId we are looking for
-        def targetAssetId = "its-agentic-parent-pom"
-        // 2. Use jq to filter the dependencies array and return a raw string
-        // -r ensures raw output (no quotes around the strings)
-        // We fetch the groupId, assetId, and version separated by spaces
-        def result = sh(
-            script: """
-                jq -r '.dependencies[] | select(.assetId == "${targetAssetId}") | "\\(.groupId) \\(.assetId) \\(.version)"' dependency.json
-            """,
-            returnStdout: true
-        ).trim()
-
-        def parentBlock = ""
-        if (result) {
-            // 3. Split the space-separated string into a list
-            def parts = result.split(' ')
-            def gId = parts[0]
-            def aId = parts[1]
-            def vId = parts[2]
-
-            // 4. Construct the XML block
-            parentBlock = """
-                <parent>
-                    <groupId>${gId}</groupId>
-                    <artifactId>${aId}</artifactId>
-                    <version>${vId}</version>
-                </parent>
-            """
-
-            echo "Successfully generated XML via jq:"
-            echo "parentBlock: ${parentBlock}"
-        } else {
-            error "Dependency '${targetAssetId}' not found in dependency.json using jq"
-        }  
-        
         sh '''
             # move log4j2.xml to broker app resources folder
-            cp -f resources/log4j2.xml target/broker-mule-app/src/main/resources/
+            cp -f resources/dev/log4j2.xml target/broker-mule-app/src/main/resources/
             
             # cd in to broker mule app in target folder
             cd target/broker-mule-app 
-            
-            ls -latr
-         '''
-        
-        echo "On target folder.."
-        
-        echo "BROKER_APP_LOCATION: ${BROKER_APP_LOCATION}"
-        // Injecting parent Pom reference
-        def pomFile =  "${BROKER_APP_LOCATION}/pom.xml"
-        echo "Read Pom.xml file from ${pomFile}"
-        String content = readFile(pomFile)
-
-        echo "Injecting ParentBlock: ${parentBlock}"
-
-        // Check if parent already exists to avoid double injection
-        if (!content.contains("<parent>")) {
-            echo "Injecting Parent POM reference..."
-            // Regex looks for the <project> tag and replaces it with itself + the parent block
-            // The (?s) allows the dot to match newlines if necessary
-            content = content.replaceFirst(/(<project[^>]*>)/, "\$1${parentBlock}")
-            writeFile(file: pomFile, text: content)
-            echo "Parent POM reference injected..."
-        } else {
-            echo "Parent tag already exists in pom.xml. Skipping."
-        }
-
-        sh '''
-            # cd in to broker mule app in target folder as it might be in root folder
-            cd target/broker-mule-app 
-
-            ls -latr
 
             # Recreate the broker mule app Jar
             mvn clean package
 
             # move to target folder of broker-mule-app 
             cd target
-        '''
 
-        echo "Setting vars for anypoint-cli-v4"
-        sh '''
-                npx anypoint-cli-v4 conf client_id $AP_CA_CLIENT_ID
-                npx anypoint-cli-v4 conf client_secret $AP_CA_CLIENT_SECRET
-                npx anypoint-cli-v4 conf organization ${ORG_ID}
         '''
+       
+       echo "Setting vars for anypoint-cli-v4"
+       sh '''
+            npx anypoint-cli-v4 conf client_id $AP_CA_CLIENT_ID
+            npx anypoint-cli-v4 conf client_secret $AP_CA_CLIENT_SECRET
+            npx anypoint-cli-v4 conf organization ${ORG_ID}
+       '''
 
        echo "Publishing app asset to Exchange"
 
@@ -207,7 +142,7 @@ void injectDependencyAndUploadJar() {
        def APP_JAR_NAME = "${ASSET_ID}-${APP_VERSION}-mule-application.jar"
        echo "APP_JAR_NAME: $APP_JAR_NAME"
 
-       def APP_JAR_LOCATION = "${BROKER_APP_LOCATION}/target/${APP_JAR_NAME}"
+       def APP_JAR_LOCATION = "/home/cdelivery/.jenkins/jobs/ITS-AGENTFABRICS-PROTOTYPE/branches/DEV/workspace/target/broker-mule-app/target/${APP_JAR_NAME}"
        echo "APP_JAR_LOCATION: $APP_JAR_LOCATION"
 
        // ASSET UPLOAD COMMENTED: TODO: TO ADD LATER
@@ -218,41 +153,7 @@ void injectDependencyAndUploadJar() {
             --name=${asset_name}
          """
     
-        echo "App Jar with dependencies published to Exchange: $APP_JAR_NAME" 
-    }
-}
-
-
-void modifyDeploySteps() {
-   	env.deployENV = (ENV=='prod') ? 'Production' : ENV
-   		
-   	// properties = readProperties file: "/opt/properties/apps/ITS/${APP_NAME.toUpperCase()}/${ENV}_env.properties"
-   	// env.noOfWorkers = "${properties.no_of_worker}"
-   	// env.workerType = "${properties.worker_type}"
-   	// env.ENV_ID = "${properties.env_id}"
-   	// env.batch_size_count="${properties.batch_size_count}"
-    // env.batch_interval="${properties.batch_interval}"
-    // env.batch_size_bytes="${properties.batch_size_bytes}"
-         
-   		
-    withCredentials([
-        // string(credentialsId: "${ENV}-${APP_NAME}-secure.key", variable: 'SECURE_KEY'),
-        string(credentialsId: "${ENV}-splunk_token", variable: 'SPLUNK_TOKEN'),        
-        //string(credentialsId: "${ENV}-openai-key", variable: 'API_KEY'),
-        usernamePassword(credentialsId: "${ENV}-anypointmq.credential", usernameVariable: 'ANYPOINTMQ_CLIENT_ID', passwordVariable: 'ANYPOINTMQ_CLIENT_SECRET'),
-        usernamePassword(credentialsId: "${ENV}-anypointplatform-connected-app", usernameVariable: 'AP_CA_CLIENT_ID', passwordVariable: 'AP_CA_CLIENT_SECRET')
-    ]) {
-
-        echo "Setting vars for anypoint-cli-v4"
-        sh '''
-                npx anypoint-cli-v4 conf client_id $AP_CA_CLIENT_ID
-                npx anypoint-cli-v4 conf client_secret $AP_CA_CLIENT_SECRET
-                npx anypoint-cli-v4 conf organization ${ORG_ID}
-        '''
-
-        def asset_name = "${ASSET_ID}-app"
-        echo "asset_name: $asset_name"
-
+        echo "App Jar Published to Exchange: $APP_JAR_NAME" 
         echo "Env is ${ENV}, getting app list"
         def rawAppListJson = sh(
             script: "anypoint-cli-v4 runtime-mgr:application:list --environment ${ENV} --output json",
@@ -325,8 +226,7 @@ void modifyDeploySteps() {
                     --property batch_size_count:1 \
                     --property batch_interval:0 \
                     --property batch_size_bytes:1024 \
-                    --property environment:${ENV} \
-                    --secureProperty splunk.token:${SPLUNK_TOKEN} \
+                    --secureProperty SPLUNK_TOKEN:${SPLUNK_TOKEN} \
                     --secureProperty anypointmq.clientid:${ANYPOINTMQ_CLIENT_ID} \
                     --secureProperty anypointmq.clientsecret:${ANYPOINTMQ_CLIENT_SECRET} \
                     --secureProperty openai.apiKey:XXXX \
@@ -334,19 +234,15 @@ void modifyDeploySteps() {
             returnStdout: true
         ).trim()
 
-        echo "Redeploy command response: ${rawAppModifyJson}"
+        echo "Redeploy command respons: ${rawAppModifyJson}"
     }
 }
-
  
 pipeline {
     agent any
     environment {
         APP_NAME = 'its-agentfabric-prototype'
         ORG_ID = 'fd48cc65-d939-425c-a990-099a23d246ae'
-        ASSET_ID = ''
-
-        APP_LOCATION = "/home/cdelivery/.jenkins/jobs/${APP_NAME}"
         
         min = 8081
         max = 40000
@@ -359,10 +255,11 @@ pipeline {
 
     tools {
         nodejs "${NODE_VERSION}"
+        //node "${NODE_VERSION}"
     }
 
     stages {
-        stage('Setup Environment') {
+       stage('Setup Environment') {
             steps {
                 echo 'Setting up build environment...'
                 sh '''
@@ -401,7 +298,7 @@ pipeline {
             }
         }
 
-        stage('Setup parameters') {
+      stage('Setup parameters') {
            when {
                 branch "master"
             }
@@ -422,6 +319,7 @@ pipeline {
             when {
                 expression {
                     env.GIT_BRANCH == "DEV"
+                    //env.GIT_BRANCH == "feature-prototype"
                 }
             }
             environment {
@@ -444,50 +342,46 @@ pipeline {
             environment {
                 ENV = 'stage'
                 target_space = 'UCSF-NONPROD'
-                ENV_ID = '50f2dbae-fde6-4b6d-b75b-3fcd027dcf9d'
             }
             steps {
                 sh 'cp -f resources/stage/exchange.json ./'
                 buildSteps()
-                buildSteps2()
             }
+ 
         }
         stage('PROD Build') {
             when {
                 expression {
-                    params.DEPLOY_TO_PROD == 'YES'
+                      params.DEPLOY_TO_PROD == 'YES'
                 }
             }
             environment {
                 ENV = 'prod'
                 target_space = 'UCSF-PROD'
-                ENV_ID = '8b4f2d7b-77fd-42af-ad4f-79b1bcae6947'
             }
             steps {
                 sh 'cp -f resources/prod/exchange.json ./'
                 buildSteps()
-                buildSteps2()
             }
+ 
         }
         stage('Deploy to Dev') {
             when {
                 expression {
                     env.GIT_BRANCH == "DEV"
+                    //env.GIT_BRANCH == "feature-prototype"
                 }
             }
             environment {
                 ENV = 'dev'
                 APP_NAME_DEPLOYMENT = "${ENV}-${APP_NAME}"
-                BROKER_APP_LOCATION = "${APP_LOCATION}/branches/${ENV}/workspace/target/broker-mule-app"
                 target_space = 'UCSF-NONPROD'
             }
             steps {
                 deploySteps()
-                injectDependencyAndUploadJar()
-                modifyDeploySteps()
             }
         }
-        stage('Deploy to Stage') {
+       stage('Deploy to Stage') {
             when {
                 expression {
                     env.GIT_BRANCH == "STAGE"
@@ -496,15 +390,13 @@ pipeline {
             environment {
                 ENV = 'stage'
                 APP_NAME_DEPLOYMENT = "${ENV}-${APP_NAME}"
-                BROKER_APP_LOCATION = "${APP_LOCATION}/branches/${ENV}/workspace/target/broker-mule-app"
                 target_space = 'UCSF-NONPROD'
             }
             steps {
                 deploySteps()
-                modifyDeploySteps()
             }
         }
-        stage('Deploy to Prod') {
+         stage('Deploy to Prod') {
             when {
                 expression {
                     params.DEPLOY_TO_PROD == 'YES'
@@ -513,12 +405,10 @@ pipeline {
             environment {
                 ENV = 'prod'
                 APP_NAME_DEPLOYMENT = "${ENV}-${APP_NAME}"
-                BROKER_APP_LOCATION = "${APP_LOCATION}/branches/${ENV}/workspace/target/broker-mule-app"
                 target_space = 'UCSF-PROD'
             }
             steps {
                 deploySteps()
-                modifyDeploySteps()
             }
         }
     }

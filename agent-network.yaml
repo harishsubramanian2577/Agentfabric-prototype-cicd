@@ -32,9 +32,9 @@ brokers:
     spec:
       llm:
         ref:
-          name: ITS-OpenAI
+          name: customer-open-ai
         configuration:
-          model: ${itsopenai.modelName}
+          model: ${openai.modelName}
       instructions:
         - |
             You are the Customer Onboarding Orchestrator. Coordinate onboarding of a new customer across the systems needed for day-to-day work.
@@ -110,56 +110,198 @@ mcpServers:
               kind: streamableHttp
               path: /mcp        
 llmProviders:
-  ITS-OpenAI:
-    label: ITSOpenAI
-    description: ITS Open AI LLM Provider
-    metadata:
-      platform: OpenAI
-      models:
-        - ${itsopenai.modelName}
+    customer-open-ai:
+        label: Customer OpenAI
+        description: customer-OpenAI LLM Provider
+        metadata:
+            platform: OpenAI
 connections:
-  customer-workday-agent:
-    kind: agent
-    ref:
-      name: customer-workday-agent
-    spec:
-      url: ${customer-workday-agent.url}
-  customer-badging-agent:
-    kind: agent
-    ref:
-      name: customer-badging-agent
-    spec:
-      url: ${customer-badging-agent.url}
-  customer-salesforce-agent:
-    kind: agent
-    ref:
-      name: customer-salesforce-agent
-    spec:
-      url: ${customer-salesforce-agent.url}
-  customer-zendesk-agent:
-    kind: agent
-    ref:
-      name: customer-zendesk-agent
-    spec:
-      url: ${customer-zendesk-agent.url}
-  customer-it-agent:
-    kind: agent
-    ref:
-      name: customer-it-agent
-    spec:
-      url: ${customer-it-agent.url}
-  customer-talent-pool-mcp:
-    kind: mcp
-    ref:
-      name: customer-talent-pool-mcp
-    spec:
-      url: ${customer-talent-pool-mcp.url}
-  my-open-ai-connection:
-    kind: llm
-    ref:
-      name: ITS-OpenAI
-    spec:
-      url: ${itsopenai.url}
-      configuration:
-        apiKey: ${itsopenai.apiKey}
-        timeout: 600000
+    customer-workday-agent:
+        kind: agent
+        ref:
+            name: customer-workday-agent
+        spec:
+            url: https://workday-agent-v1-2p52mj.5sc6y6-4.usa-e2.cloudhub.io/workday-agent/
+            policies:
+                - ref:
+                    name: message-logging
+                    namespace: 68ef9520-24e9-4cf2-b2f5-620025690913
+                  configuration:
+                    loggingConfiguration:
+                        - itemName: "Payload"
+                          itemData:
+                              message: "#[payload]"
+                              firstSection: true
+                              secondSection: true
+                              level: "DEBUG"
+                        - itemName: "Headers"
+                          itemData:
+                              message: "#[attributes.headers]"
+                              firstSection: true
+                              secondSection: true
+                              level: "DEBUG"
+        
+    customer-badging-agent:
+        kind: agent
+        ref:
+            name: customer-badging-agent
+        spec:
+            url: https://badging-agent-v1-2p52mj.5sc6y6-4.usa-e2.cloudhub.io/badge-agent/
+            policies:
+                - ref:
+                    name: message-logging
+                    namespace: 68ef9520-24e9-4cf2-b2f5-620025690913
+                  configuration:
+                    loggingConfiguration:
+                        - itemName: "Payload"
+                          itemData:
+                              message: "#[payload]"
+                              firstSection: true
+                              secondSection: true
+                              level: "DEBUG"
+                        - itemName: "Headers"
+                          itemData:
+                              message: "#[attributes.headers]"
+                              firstSection: true
+                              secondSection: true
+                              level: "DEBUG"
+    customer-salesforce-agent:
+        kind: agent
+        ref:
+            name: customer-salesforce-agent
+        spec:
+            url: https://salesforce-agent-v1-2p52mj.5sc6y6-2.usa-e2.cloudhub.io/salesforce-agent/
+            policies:
+                - ref:
+                    name: message-logging
+                    namespace: 68ef9520-24e9-4cf2-b2f5-620025690913
+                  configuration:
+                    loggingConfiguration:
+                        - itemName: "Payload"
+                          itemData:
+                              message: "#[payload]"
+                              firstSection: true
+                              secondSection: true
+                              level: "DEBUG"
+                        - itemName: "Headers"
+                          itemData:
+                              message: "#[attributes.headers]"
+                              firstSection: true
+                              secondSection: true
+                              level: "DEBUG"
+    customer-zendesk-agent:
+        kind: agent
+        ref:
+            name: customer-zendesk-agent
+        spec:
+            url: https://zendesk-agent-v1-2p52mj.5sc6y6-3.usa-e2.cloudhub.io/zendesk/
+            policies:
+                - ref:
+                    name: message-logging
+                    namespace: 68ef9520-24e9-4cf2-b2f5-620025690913
+                  configuration:
+                    loggingConfiguration:
+                        - itemName: "Payload"
+                          itemData:
+                              message: "#[payload]"
+                              firstSection: true
+                              secondSection: true
+                              level: "DEBUG"
+                        - itemName: "Headers"
+                          itemData:
+                              message: "#[attributes.headers]"
+                              firstSection: true
+                              secondSection: true
+                              level: "DEBUG"
+    customer-it-agent:
+        kind: agent
+        ref:
+            name: customer-it-agent
+        spec:
+            url: https://it-agent-v1-2p52mj.5sc6y6-4.usa-e2.cloudhub.io/pingid/
+            policies:
+                - ref:
+                    name: message-logging
+                    namespace: 68ef9520-24e9-4cf2-b2f5-620025690913
+                  configuration:
+                    loggingConfiguration:
+                        - itemName: "Payload"
+                          itemData:
+                              message: "#[payload]"
+                              firstSection: true
+                              secondSection: true
+                              level: "DEBUG"
+                        - itemName: "Headers"
+                          itemData:
+                              message: "#[attributes.headers]"
+                              firstSection: true
+                              secondSection: true
+                              level: "DEBUG"
+    customer-talent-pool-mcp:
+        kind: mcp
+        ref:
+            name: customer-talent-pool-mcp
+        spec:
+            url: https://talent-pool-arvldt.5sc6y6-3.usa-e2.cloudhub.io/
+            policies:
+                - ref:
+                    name: message-logging
+                    namespace: 68ef9520-24e9-4cf2-b2f5-620025690913
+                  configuration:
+                    loggingConfiguration:
+                        - itemName: "Payload"
+                          itemData:
+                              message: "#[payload]"
+                              firstSection: true
+                              secondSection: true
+                              level: "DEBUG"
+                        - itemName: "Headers"
+                          itemData:
+                              message: "#[attributes.headers]"
+                              firstSection: true
+                              secondSection: true
+                              level: "DEBUG"
+    my-open-ai-connection:
+        kind: llm
+        ref:
+            name: customer-open-ai
+        spec:
+            url: ${openai.url}
+            configuration:
+                apiKey: ${openai.apiKey}
+                timeout: 600000
+            policies:
+                - ref:
+                    name: header-removal
+                    namespace: 68ef9520-24e9-4cf2-b2f5-620025690913
+                  configuration:
+                    inboundHeaders:
+                      - tracestate
+                      - x-stainless-arch
+                      - x-stainless-kotlin-version
+                      - x-stainless-lang
+                      - x-stainless-os
+                      - x-stainless-os-version
+                      - x-stainless-package-version
+                      - x-stainless-retry-count
+                      - x-stainless-runtime
+                      - x-stainless-runtime-version
+                      - authorization
+                      - user-agent
+                - ref:
+                    name: message-logging
+                    namespace: 68ef9520-24e9-4cf2-b2f5-620025690913
+                  configuration:
+                    loggingConfiguration:
+                        - itemName: "Payload"
+                          itemData:
+                              message: "#[payload]"
+                              firstSection: true
+                              secondSection: true
+                              level: "DEBUG"
+                        - itemName: "Headers"
+                          itemData:
+                              message: "#[attributes.headers]"
+                              firstSection: true
+                              secondSection: true
+                              level: "DEBUG"
