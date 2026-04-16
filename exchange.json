@@ -1,10 +1,10 @@
 {
   "main": "agent-network.yaml",
-  "name": "Demo UCSF Onboarding Agent",
+  "name": "Demo TEST Onboarding Agent",
   "classifier": "agent-network",
   "organizationId": "fd48cc65-d939-425c-a990-099a23d246ae",
   "descriptorVersion": "1.0.0",
-  "tags": ["UCSF-demo-onboarding-agent"],
+  "tags": ["TEST-demo-onboarding-agent"],
   "metadata": {
     "variables": {
       "customer-workday-agent": {
@@ -52,7 +52,7 @@
       "openai": {
         "url": {
           "description": "ITS-OpenAI URL",
-          "default": "https://dev-unified-api.ucsf.edu/general/openai/v1/",
+          "default": "https://dev-unified-api.TEST.edu/general/openai/v1/",
           "secret": false
         },
         "apiKey": {
@@ -84,6 +84,6 @@
     }
   ],
   "groupId": "fd48cc65-d939-425c-a990-099a23d246ae",
-  "assetId": "demo-ucsf-onboarding-agent",
+  "assetId": "demo-TEST-onboarding-agent",
   "version": "1.2.4"
 }

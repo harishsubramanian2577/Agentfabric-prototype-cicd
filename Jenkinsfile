@@ -426,7 +426,7 @@ pipeline {
             }
             environment {
                 ENV = 'dev'
-                target_space = 'TEST-NONPROD'
+                target_space = 'HarishNewPS1'
                 ENV_ID = 'a4bc7f3d-b8a5-4ec5-996c-1a7ed5c7e493'
             }
             steps {
@@ -443,7 +443,7 @@ pipeline {
             }
             environment {
                 ENV = 'stage'
-                target_space = 'TEST-NONPROD'
+                target_space = 'HarishNewPS1'
                 ENV_ID = '50f2dbae-fde6-4b6d-b75b-3fcd027dcf9d'
             }
             steps {
