@@ -412,14 +412,14 @@ pipeline {
                     ./jq -r '.assetId' exchange.json
                 """
 
-                def resultId = sh(
-                    script: """
-                        ./jq -r '.assetId' exchange.json
-                    """,
-                    returnStdout: true
-                ).trim()
+                // def resultId = sh(
+                //     script: """
+                //         ./jq -r '.assetId' exchange.json
+                //     """,
+                //     returnStdout: true
+                // ).trim()
 
-                echo "resultId: ${resultId}"
+                // echo "resultId: ${resultId}"
 
             }
         }
