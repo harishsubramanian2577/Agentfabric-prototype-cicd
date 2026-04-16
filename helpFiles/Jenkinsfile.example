@@ -1,0 +1,95 @@
+pipeline {
+    agent any
+    
+    parameters {
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['dev', 'stage', 'prod'],
+            description: 'Target environment for deployment'
+        )
+        booleanParam(
+            name: 'DRY_RUN',
+            defaultValue: false,
+            description: 'Perform a dry run without actual deployment'
+        )
+    }
+    
+    environment {
+        // Set any necessary environment variables
+        ANYPOINT_USERNAME = credentials('anypoint-username')
+        ANYPOINT_PASSWORD = credentials('anypoint-password')
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Prepare Deployment Command') {
+            steps {
+                script {
+                    // Generate the deployment command with all properties
+                    env.DEPLOY_COMMAND = sh(
+                        script: "./jenkins-deploy-helper.sh ${params.ENVIRONMENT}",
+                        returnStdout: true
+                    ).trim()
+                    
+                    echo "Generated deployment command:"
+                    echo "${env.DEPLOY_COMMAND}"
+                }
+            }
+        }
+        
+        stage('Login to Anypoint') {
+            steps {
+                script {
+                    sh '''
+                        anypoint-cli auth:login \
+                            --username "${ANYPOINT_USERNAME}" \
+                            --password "${ANYPOINT_PASSWORD}"
+                    '''
+                }
+            }
+        }
+        
+        stage('Deploy Agent Network') {
+            when {
+                not { params.DRY_RUN }
+            }
+            steps {
+                script {
+                    sh "${env.DEPLOY_COMMAND}"
+                }
+            }
+        }
+        
+        stage('Dry Run') {
+            when {
+                params.DRY_RUN
+            }
+            steps {
+                script {
+                    echo "DRY RUN - Would execute:"
+                    echo "${env.DEPLOY_COMMAND}"
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            script {
+                // Logout from Anypoint CLI
+                sh 'anypoint-cli auth:logout || true'
+            }
+        }
+        success {
+            echo "Agent Network deployment completed successfully!"
+        }
+        failure {
+            echo "Agent Network deployment failed!"
+        }
+    }
+}

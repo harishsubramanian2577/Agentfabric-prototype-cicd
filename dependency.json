@@ -1,0 +1,9 @@
+{
+    "dependencies": [
+        {
+            "groupId": "fd48cc65-d939-425c-a990-099a23d246ae",
+            "assetId": "its-agentic-parent-pom",
+            "version": "1.0.0"
+        }
+    ]
+}
