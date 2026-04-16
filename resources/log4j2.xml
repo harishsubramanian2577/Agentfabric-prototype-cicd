@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Configuration status="INFO" name="cloudhub" packages="com.splunk.logging,org.apache.logging.log4j,org.javastack.log4j.simplejson,edu.ucsf.appender" monitorInterval="30">
+<Configuration status="INFO" name="cloudhub" packages="com.splunk.logging,org.apache.logging.log4j,org.javastack.log4j.simplejson" monitorInterval="30">
 
 	<properties>
 		<property name="splunkhttpJson">
@@ -33,7 +33,7 @@
 			<PatternLayout pattern="${jsonlayout}" charset="UTF-8" />
 		</AnypointMqAppender>
 
-		<SplunkHttp name="Splunk" url="https://splunkindexer.ucsfmedicalcenter.org" token="${sys:splunk.token}" index="${environment.${lower:${sys:environment}}}_mule_app_logs"
+		<SplunkHttp name="Splunk" url="https://splunkindexer.abcxyz.org" token="${sys:splunk.token}" index="${environment.${lower:${sys:environment}}}_mule_app_logs"
 			source="${sys:app.name}" sourceType="mule-app" messageFormat="json" batch_size_count="${sys:batch_size_count}" batch_interval="${sys:batch_interval}" batch_size_bytes="${sys:batch_size_bytes}"
 			disableCertificateValidation="true">
 			<PatternLayout pattern="${splunkhttpJson}" charset="UTF-8" />
