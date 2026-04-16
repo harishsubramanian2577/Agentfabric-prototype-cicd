@@ -409,7 +409,18 @@ pipeline {
                 sh """
                     curl -L https://github.com/jqlang/jq/releases/latest/download/jq-linux64 -o jq
                     chmod +x jq
+                    ./jq -r '.assetId' exchange.json
                 """
+
+                def resultId = sh(
+                    script: """
+                        ./jq -r '.assetId' exchange.json
+                    """,
+                    returnStdout: true
+                ).trim()
+
+                echo "resultId: ${resultId}"
+
             }
         }
 
