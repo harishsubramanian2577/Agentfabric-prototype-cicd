@@ -1,10 +1,10 @@
 {
   "main": "agent-network.yaml",
-  "name": "Demo UCSF Onboarding Agent",
+  "name": "Demo TEST Onboarding Agent",
   "classifier": "agent-network",
   "organizationId": "a19065cb-4dd4-4916-9401-bb64b169742c",
   "descriptorVersion": "1.0.0",
-  "tags": ["UCSF-demo-onboarding-agent"],
+  "tags": ["TEST-demo-onboarding-agent"],
   "metadata": {
     "variables": {
       "customer-workday-agent": {
@@ -49,15 +49,15 @@
           "secret": false
         }
       },
-      "itsopenai": {
+      "openai": {
         "url": {
           "description": "ITS-OpenAI URL",
-          "default": "https://dev-unified-api.ucsf.edu/general/openai/v1/chat/completions",
+          "default": "https://dev-unified-api.TEST.edu/general/openai/v1/",
           "secret": false
         },
         "apiKey": {
-          "description": "ITS-OpenAI api key",
-          "default": ""
+          "description": "Customer OpenAI API key (ie: Azure)",
+          "default": "XXXX"
         },
         "modelName": {
           "description": "Customer OpenAI LLM Model Name",
@@ -67,8 +67,23 @@
       }
     }
   },
-  "dependencies": [],
+  "dependencies": [
+    {
+      "classifier": "schema",
+      "packaging": "zip",
+      "groupId": "68ef9520-24e9-4cf2-b2f5-620025690913",
+      "assetId": "message-logging",
+      "version": "2.0.2"
+    },
+    {
+      "classifier": "schema",
+      "packaging": "zip",
+      "groupId": "68ef9520-24e9-4cf2-b2f5-620025690913",
+      "assetId": "header-removal",
+      "version": "1.1.2"
+    }
+  ],
   "groupId": "a19065cb-4dd4-4916-9401-bb64b169742c",
-  "assetId": "demo-ucsf-onboarding-agent",
-  "version": "1.1.4"
+  "assetId": "demo-TEST-onboarding-agent",
+  "version": "1.0.0"
 }
