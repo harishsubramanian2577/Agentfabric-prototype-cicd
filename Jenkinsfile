@@ -426,7 +426,7 @@ pipeline {
             }
             environment {
                 ENV = 'dev'
-                target_space = 'UCSF-NONPROD'
+                target_space = 'TEST-NONPROD'
                 ENV_ID = 'a4bc7f3d-b8a5-4ec5-996c-1a7ed5c7e493'
             }
             steps {
@@ -443,7 +443,7 @@ pipeline {
             }
             environment {
                 ENV = 'stage'
-                target_space = 'UCSF-NONPROD'
+                target_space = 'TEST-NONPROD'
                 ENV_ID = '50f2dbae-fde6-4b6d-b75b-3fcd027dcf9d'
             }
             steps {
@@ -460,7 +460,7 @@ pipeline {
             }
             environment {
                 ENV = 'prod'
-                target_space = 'UCSF-PROD'
+                target_space = 'TEST-PROD'
                 ENV_ID = '8b4f2d7b-77fd-42af-ad4f-79b1bcae6947'
             }
             steps {
@@ -479,7 +479,7 @@ pipeline {
                 ENV = 'dev'
                 APP_NAME_DEPLOYMENT = "${ENV}-${APP_NAME}"
                 BROKER_APP_LOCATION = "${APP_LOCATION}/branches/${ENV}/workspace/target/broker-mule-app"
-                target_space = 'UCSF-NONPROD'
+                target_space = 'TEST-NONPROD'
             }
             steps {
                 deploySteps()
@@ -497,7 +497,7 @@ pipeline {
                 ENV = 'stage'
                 APP_NAME_DEPLOYMENT = "${ENV}-${APP_NAME}"
                 BROKER_APP_LOCATION = "${APP_LOCATION}/branches/${ENV}/workspace/target/broker-mule-app"
-                target_space = 'UCSF-NONPROD'
+                target_space = 'TEST-NONPROD'
             }
             steps {
                 deploySteps()
@@ -514,7 +514,7 @@ pipeline {
                 ENV = 'prod'
                 APP_NAME_DEPLOYMENT = "${ENV}-${APP_NAME}"
                 BROKER_APP_LOCATION = "${APP_LOCATION}/branches/${ENV}/workspace/target/broker-mule-app"
-                target_space = 'UCSF-PROD'
+                target_space = 'TEST-PROD'
             }
             steps {
                 deploySteps()

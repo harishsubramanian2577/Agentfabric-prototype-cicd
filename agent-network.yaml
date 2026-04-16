@@ -1,12 +1,12 @@
 schemaVersion: 1.0.0
-label: UCSF Demo onboarding Agent Network 
+label: TEST Demo onboarding Agent Network 
 brokers:
-  demo-ucsf-onboarding-agent-broker:
+  demo-TEST-onboarding-agent-broker:
     card:
       protocolVersion: 0.3.0
-      name: UCSF Demo onboarding Agent Broker
+      name: TEST Demo onboarding Agent Broker
       description: This is a Demo Agent Broker for onboarding.
-      url: ${ingressgw.url}/demo-ucsf-onboarding-agent-broker
+      url: ${ingressgw.url}/demo-TEST-onboarding-agent-broker
       capabilities:
         pushNotifications: true
       version: 1.0.0
@@ -17,8 +17,8 @@ brokers:
       defaultOutputModes:
         - application/json
       skills:
-        - id: demo-ucsf-onboarding-agent
-          name: UCSF Demo onboarding Agent
+        - id: demo-TEST-onboarding-agent
+          name: TEST Demo onboarding Agent
           description: This agent acts as a broker, orchestrating the use of various specialized tools and agents (including MCP) to effectively manage customer onboarding.
           examples:
             -  Onboard a new customer. Their name is 'Alex Smith', email is 'alex.smith@example.com', and phone number is '555-123-4567'
@@ -28,7 +28,7 @@ brokers:
           outputModes:
             - application/json
             - text/plain
-          tags: [UCSF-demo-onboarding-agent]
+          tags: [TEST-demo-onboarding-agent]
     spec:
       llm:
         ref:
