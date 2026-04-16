@@ -402,6 +402,17 @@ pipeline {
             }
         }
 
+        stage('Install jq plugin'){
+            steps {
+                echo 'Installing jq'
+
+                sh """
+                    curl -L https://github.com/jqlang/jq/releases/latest/download/jq-linux64 -o jq
+                    chmod +x jq
+                """
+            }
+        }
+
         stage('Setup parameters') {
            when {
                 branch "master"
