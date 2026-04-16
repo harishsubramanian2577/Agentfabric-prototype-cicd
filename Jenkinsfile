@@ -158,7 +158,7 @@ void injectDependencyAndUploadJar() {
             cd target/broker-mule-app 
             
             ls -latr
-            
+
             pwd
          '''
         
@@ -347,12 +347,13 @@ void modifyDeploySteps() {
 pipeline {
     agent any
     environment {
-        APP_NAME = 'its-agentfabrics-prototype'
+        //APP_NAME = 'its-agentfabrics-prototype'
+        APP_NAME = 'ITS-AGENTFABRICS-PROTOTYPE'
         ORG_ID = 'a19065cb-4dd4-4916-9401-bb64b169742c'
         ASSET_ID = ''
 
-        APP_LOCATION = "/home/cdelivery/.jenkins/jobs/${APP_NAME}"
-        
+        //APP_LOCATION = "/home/cdelivery/.jenkins/jobs/${APP_NAME}"
+        APP_LOCATION = "/var/jenkins_home/workspace"
         min = 8081
         max = 40000
         random_port = "${(int)(Math.random() * (max - min) + 1) + min}"
@@ -513,7 +514,8 @@ pipeline {
                 //ENV = 'DEV'
                 ENV = 'Dev'
                 APP_NAME_DEPLOYMENT = "${ENV}-${APP_NAME}"
-                BROKER_APP_LOCATION = "${APP_LOCATION}/branches/${ENV}/workspace/target/broker-mule-app"
+                //BROKER_APP_LOCATION = "${APP_LOCATION}/branches/${ENV}/workspace/target/broker-mule-app"
+                BROKER_APP_LOCATION = "${APP_LOCATION}/${APP_NAME}_DEV/target/broker-mule-app"
                 target_space = 'HarishNewPS1'
             }
             steps {
