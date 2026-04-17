@@ -318,7 +318,7 @@ void modifyDeploySteps() {
         echo "Generated Properties String: ${formattedPropsArgs}"
 
         echo "Modifying deployment for appId ${deploymentId}, asset_name ${asset_name} and ${APP_VERSION}"
-        echo "with additional property args: ${propertyArgs}"
+        //echo "with additional property args: ${propertyArgs}"
         def rawAppModifyJson = sh(
             script: "anypoint-cli-v4 runtime-mgr:application:modify ${deploymentId} \
                     --groupId ${ORG_ID} \
