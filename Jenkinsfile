@@ -77,7 +77,7 @@ void deploySteps() {
         echo "APP_NAME: ${APP_NAME_DEPLOYMENT}"
 
         // Extract version using jq
-        def APP_VERSION = sh(
+        APP_VERSION = sh(
             script: "jq -r '.version' ${exchangeFile}",
             returnStdout: true
         ).trim()
@@ -351,6 +351,7 @@ pipeline {
         APP_NAME = 'ITS-AGENTFABRICS-PROTOTYPE'
         ORG_ID = 'a19065cb-4dd4-4916-9401-bb64b169742c'
         ASSET_ID = ''
+        APP_VERSION = ''
 
         //APP_LOCATION = "/home/cdelivery/.jenkins/jobs/${APP_NAME}"
         APP_LOCATION = "/var/jenkins_home/workspace"
