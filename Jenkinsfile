@@ -369,6 +369,7 @@ pipeline {
 
     tools {
         nodejs "${NODE_VERSION}"
+        maven 'mvn'
     }
 
     stages {
