@@ -27,3 +27,4 @@ replay_pid*
 /.mvn
 .vscode/settings.json
 .DS_Store
+projs.code-workspace
