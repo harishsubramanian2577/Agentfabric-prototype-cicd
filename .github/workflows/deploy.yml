@@ -51,6 +51,8 @@ jobs:
       AP_CA_CLIENT_ID: 'dbceb4d467664d8382a5bcf1a628eaa0'
       AP_CA_CLIENT_SECRET: 'DF7a68e65163496EB2c0D56155D266E4'
       ANYPOINT_EXCHANGE_ORG_ID: 'a19065cb-4dd4-4916-9401-bb64b169742c'
+      APP_NAME: 'its-agentfabric-prototype'
+      target_space: 'HarishNewPS1'
       # MULE_REPO_PASSWORD: ${{ secrets.MULE_REPO_PASSWORD }}
       # ANYPOINT_EXCHANGE_CLIENT_SECRET: ${{ secrets.ANYPOINT_EXCHANGE_CLIENT_SECRET }}
       # AP_CA_CLIENT_ID: ${{ vars['DEV_AP_CA_CLIENT_ID'] }}
@@ -152,4 +154,181 @@ jobs:
           npx anypoint-cli-agent-fabric-plugin conf client_secret $AP_CA_CLIENT_SECRET
           npx anypoint-cli-agent-fabric-plugin conf organization ${ORG_ID}
           npx anypoint-cli-agent-fabric-plugin agent-network project build --client_id $AP_CA_CLIENT_ID --client_secret $AP_CA_CLIENT_SECRET --organization ${ORG_ID}
+
+
+      - name: Deploy Steps
+        env:
+          ENV: ${{ env.ENVIRONMENT }}
+          TARGET_SPACE: ${{ env.target_space }}
+          SPLUNK_TOKEN: 'TestToken'
+          ANYPOINTMQ_CLIENT_ID: 'MQ_Client_ID'
+          ANYPOINTMQ_CLIENT_SECRET: 'MQ_Client_Secret'
+          AP_CA_CLIENT_ID: ${{ env.AP_CA_CLIENT_ID }}
+          AP_CA_CLIENT_SECRET: ${{ env.AP_CA_CLIENT_SECRET }}
+          APP_NAME_DEPLOYMENT: ${{ env.APP_NAME }}
+          ORG_ID: ${{ env.ANYPOINT_EXCHANGE_ORG_ID }}
+        run: |
+          echo "Running deployment to $ENV environment"
+
+          if [ -z "$AP_CA_CLIENT_ID" ]; then echo "Client ID is EMPTY"; else echo "Client ID is set"; fi
+          if [ -z "$AP_CA_CLIENT_SECRET" ]; then echo "Client Secret is EMPTY"; else echo "Client Secret is set"; fi
+          if [ -z "$ORG_ID" ]; then echo "Org Id is EMPTY"; else echo "Org Id is set"; fi
+          if [ -z "$APP_NAME_DEPLOYMENT" ]; then echo "App Name is EMPTY"; else echo "App Name is set"; fi
+
+          # Publish artifacts to Exchange before deploy
+          npx anypoint-cli-agent-fabric-plugin agent-network project publish --client_id $AP_CA_CLIENT_ID --client_secret $AP_CA_CLIENT_SECRET --organization ${ORG_ID}
+
+          # Generate property arguments from exchange.json
+          PROPERTY_ARGS=$(jq -r '
+            .metadata.variables |
+            to_entries[] |
+            . as $var |
+            .value |
+            to_entries[] |
+            select(.value.default != null and .value.default != "") |
+            "--property \"" + ($var.key + "." + .key) + ":" + (.value.default | tostring) + "\""
+          ' exchange.json | tr '\n' ' ')
+
+          echo "propertyArgs: ${PROPERTY_ARGS}"
+          echo "APP_NAME: ${APP_NAME_DEPLOYMENT}"
+
+          # Extract version using jq
+          APP_VERSION=$(jq -r '.version' exchange.json)
+          echo "Version: ${APP_VERSION}"
+
+          # Extract asset ID using jq
+          ASSET_ID=$(jq -r '.assetId' exchange.json)
+          echo "asset_id: ${ASSET_ID}"
+
+          # Reading agentic-parent-pom dependency
+          TARGET_ASSET_ID="its-agentic-parent-pom"
+          RESULT=$(jq -r '.dependencies[] | select(.assetId == "'${TARGET_ASSET_ID}'") | "\(.groupId) \(.assetId) \(.version)"' dependency.json)
+
+          if [ -n "$RESULT" ]; then
+            G_ID=$(echo $RESULT | cut -d' ' -f1)
+            A_ID=$(echo $RESULT | cut -d' ' -f2)
+            V_ID=$(echo $RESULT | cut -d' ' -f3)
+
+            PARENT_BLOCK="<parent><groupId>${G_ID}</groupId><artifactId>${A_ID}</artifactId><version>${V_ID}</version></parent>"
+            echo "Successfully generated parent block: ${PARENT_BLOCK}"
+          else
+            echo "Dependency '${TARGET_ASSET_ID}' not found in dependency.json"
+            exit 1
+          fi
+
+          # Deploy command
+          DEPLOY_CMD="npx anypoint-cli-agent-fabric-plugin agent-network project deploy \
+            --environment ${ENV} \
+            --target-space ${TARGET_SPACE} \
+            --ingress-gw its-small-ingress-gw \
+            --egress-gw its-large-egress-gw \
+            --client_id $AP_CA_CLIENT_ID \
+            --client_secret $AP_CA_CLIENT_SECRET \
+            --organization ${ORG_ID} \
+            --property openai.apiKey:XXXX \
+            ${PROPERTY_ARGS}"
+
+          echo "Deploy args: ${DEPLOY_CMD}"
+          echo "Executing Deploy Command..."
+          eval $DEPLOY_CMD
+
+          # Move log4j2.xml to broker app resources folder
+          cp -f resources/log4j2.xml target/broker-mule-app/src/main/resources/
+
+          # cd into broker mule app in target folder
+          cd target/broker-mule-app
+          ls -latr
+
+          echo "On target folder.."
+
+          # Inject parent POM reference
+          POM_FILE="pom.xml"
+          echo "Read Pom.xml file.."
+
+          if ! grep -q "<parent>" $POM_FILE; then
+            echo "Injecting Parent POM reference..."
+            sed -i.bak "s|<project[^>]*>|&${PARENT_BLOCK}|" $POM_FILE
+            echo "Parent POM reference injected..."
+          else
+            echo "Parent tag already exists in pom.xml. Skipping."
+          fi
+
+          ls -latr
+
+          # Recreate the broker mule app Jar
+          mvn clean package
+
+          cd target
+
+          echo "Setting vars for anypoint-cli-v4"
+          npx anypoint-cli-v4 conf client_id $AP_CA_CLIENT_ID
+          npx anypoint-cli-v4 conf client_secret $AP_CA_CLIENT_SECRET
+          npx anypoint-cli-v4 conf organization ${ORG_ID}
+
+          echo "Publishing app asset to Exchange"
+
+          ASSET_NAME="${ASSET_ID}-app"
+          echo "asset_name: $ASSET_NAME"
+
+          APP_JAR_NAME="${ASSET_ID}-${APP_VERSION}-mule-application.jar"
+          echo "APP_JAR_NAME: $APP_JAR_NAME"
+
+          APP_JAR_LOCATION="${GITHUB_WORKSPACE}/target/broker-mule-app/target/${APP_JAR_NAME}"
+          echo "APP_JAR_LOCATION: $APP_JAR_LOCATION"
+
+          # Asset upload
+          npx anypoint-cli-v4 exchange:asset:upload ${ORG_ID}/${ASSET_NAME}/${APP_VERSION} \
+            --files="{\"mule-application.jar\": \"${APP_JAR_LOCATION}\"}" \
+            --type='app' \
+            --name=${ASSET_NAME}
+
+          echo "App Jar Published to Exchange: $APP_JAR_NAME"
+          echo "Env is ${ENV}, getting app list"
+
+          RAW_APP_LIST_JSON=$(npx anypoint-cli-v4 runtime-mgr:application:list --environment ${ENV} --output json)
+          echo "rawAppListJson: $RAW_APP_LIST_JSON"
+
+          # Extract the deployment ID
+          DEPLOYMENT_ID=$(echo $RAW_APP_LIST_JSON | jq -r ".[] | select(.name == \"${ASSET_ID}\") | .id")
+
+          if [ -z "$DEPLOYMENT_ID" ]; then
+            echo "Could not find deployment with name: ${ASSET_ID}"
+            exit 1
+          fi
+
+          echo "Successfully extracted Deployment ID: ${DEPLOYMENT_ID} for app: ${ASSET_ID}"
+
+          echo "Getting Properties for deploymentId ${DEPLOYMENT_ID}"
+          RAW_APP_PROPS_JSON=$(npx anypoint-cli-v4 runtime-mgr:application:describe --environment ${ENV} ${DEPLOYMENT_ID} --output json)
+          echo "rawAppPropsJson: $RAW_APP_PROPS_JSON"
+
+          # Extract properties
+          PROPS=$(echo $RAW_APP_PROPS_JSON | jq -r '.application.configuration."mule.agent.application.properties.service".properties')
+          echo "Found properties: $PROPS"
+
+          # Remove sensitive properties and rebuild property args
+          FORMATTED_PROPS_ARGS=$(echo $PROPS | jq -r 'to_entries | map(select(.key != "itsopenai.apiKey" and .key != "splunk.token" and .key != "anypointmq.clientid" and .key != "anypointmq.clientsecret")) | map("--property " + .key + ":" + (.value | tostring)) | join(" ")')
+
+          echo "Generated Properties String: ${FORMATTED_PROPS_ARGS}"
+
+          echo "Modifying deployment for appId ${DEPLOYMENT_ID}, asset_name ${ASSET_NAME} and ${APP_VERSION}"
+
+          RAW_APP_MODIFY_JSON=$(npx anypoint-cli-v4 runtime-mgr:application:modify ${DEPLOYMENT_ID} \
+            --groupId ${ORG_ID} \
+            --artifactId ${ASSET_NAME} \
+            --assetVersion ${APP_VERSION} \
+            --environment ${ENV} \
+            ${FORMATTED_PROPS_ARGS} \
+            --property app.name:${APP_NAME_DEPLOYMENT} \
+            --property batch_size_count:1 \
+            --property batch_interval:0 \
+            --property batch_size_bytes:1024 \
+            --property environment:${ENV} \
+            --secureProperty splunk.token:${SPLUNK_TOKEN} \
+            --secureProperty anypointmq.clientid:${ANYPOINTMQ_CLIENT_ID} \
+            --secureProperty anypointmq.clientsecret:${ANYPOINTMQ_CLIENT_SECRET} \
+            --secureProperty openai.apiKey:XXXX \
+            --output json)
+
+          echo "Redeploy command response: ${RAW_APP_MODIFY_JSON}"
   
