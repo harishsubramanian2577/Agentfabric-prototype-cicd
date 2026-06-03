@@ -151,5 +151,5 @@ jobs:
           npx anypoint-cli-agent-fabric-plugin conf client_id $AP_CA_CLIENT_ID
           npx anypoint-cli-agent-fabric-plugin conf client_secret $AP_CA_CLIENT_SECRET
           npx anypoint-cli-agent-fabric-plugin conf organization ${ORG_ID}
-          npx anypoint-cli-agent-fabric-plugin agent-network project build --client_id $AP_CA_CLIENT_ID --client_secret $AP_CA_CLIENT_SECRET --organization ${ORG_ID} --debug 
+          npx anypoint-cli-agent-fabric-plugin agent-network project build --client_id $AP_CA_CLIENT_ID --client_secret $AP_CA_CLIENT_SECRET --organization ${ORG_ID}
   
