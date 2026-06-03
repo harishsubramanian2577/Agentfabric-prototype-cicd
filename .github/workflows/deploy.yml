@@ -104,7 +104,7 @@ jobs:
       
       - name: Copy Environment Exchange Config
         env:
-          ENVIRONMENT: ${{ inputs.environment }}
+          ENVIRONMENT: ${{ env.ENVIRONMENT }}
         run: |
           echo "Copying Exchange Config for environment: $ENVIRONMENT"
           if [ "$ENVIRONMENT" == "DEV" ]; then
@@ -132,7 +132,7 @@ jobs:
 
       - name: Build Steps 1
         env:
-          ENVIRONMENT: ${{ inputs.environment }}
+          ENVIRONMENT: ${{ env.ENVIRONMENT }}
           AP_CA_CLIENT_ID: ${{ env.AP_CA_CLIENT_ID }}
           AP_CA_CLIENT_SECRET: ${{ env.AP_CA_CLIENT_SECRET }}
           ORG_ID: ${{ env.ANYPOINT_EXCHANGE_ORG_ID }}
