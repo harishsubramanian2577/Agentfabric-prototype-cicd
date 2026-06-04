@@ -235,7 +235,7 @@ jobs:
 
           # Move log4j2.xml to broker app resources folder
           ls -latr
-          sudo cp -f resources/log4j2.xml target/broker-mule-app/src/main/resources/log4j2.xml
+          sudo cp -f resources/log4j2.xml target/broker-mule-app/src/main/resources/
 
           # cd into broker mule app in target folder
           cd target/broker-mule-app
