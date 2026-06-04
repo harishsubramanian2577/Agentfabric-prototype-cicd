@@ -1,11 +1,11 @@
 {
   "main": "agent-network.yaml",
-  "name": "Demo TEST Onboarding Agent",
+  "name": "Demo test Onboarding Agent",
   "classifier": "agent-network",
   "organizationId": "a19065cb-4dd4-4916-9401-bb64b169742c",
   "descriptorVersion": "1.0.0",
   "tags": [
-    "TEST-demo-onboarding-agent"
+    "test-demo-onboarding-agent"
   ],
   "metadata": {
     "variables": {

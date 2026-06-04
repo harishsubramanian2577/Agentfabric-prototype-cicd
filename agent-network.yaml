@@ -1,12 +1,12 @@
 schemaVersion: 1.0.0
 label: TEST Demo onboarding Agent Network 
 brokers:
-  demo-TEST-onboarding-agent-broker:
+  demo-test-onboarding-agent-broker:
     card:
       protocolVersion: 0.3.0
       name: TEST Demo onboarding Agent Broker
       description: This is a Demo Agent Broker for onboarding.
-      url: ${ingressgw.url}/demo-TEST-onboarding-agent-broker
+      url: ${ingressgw.url}/demo-test-onboarding-agent-broker
       capabilities:
         pushNotifications: true
       version: 1.0.0
@@ -17,7 +17,7 @@ brokers:
       defaultOutputModes:
         - application/json
       skills:
-        - id: demo-TEST-onboarding-agent
+        - id: demo-test-onboarding-agent
           name: TEST Demo onboarding Agent
           description: This agent acts as a broker, orchestrating the use of various specialized tools and agents (including MCP) to effectively manage customer onboarding.
           examples:
@@ -28,7 +28,7 @@ brokers:
           outputModes:
             - application/json
             - text/plain
-          tags: [TEST-demo-onboarding-agent]
+          tags: [test-demo-onboarding-agent]
     spec:
       llm:
         ref:

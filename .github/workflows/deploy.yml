@@ -231,7 +231,30 @@ jobs:
 
           echo "Deploy args: ${DEPLOY_CMD}"
           echo "Executing Deploy Command..."
-          # eval $DEPLOY_CMD
+          eval $DEPLOY_CMD
+
+    
+
+      - name: Redeploy Steps
+        if: false
+        env:
+          # ENV: ${{ env.ENVIRONMENT }}
+          ENV: 'Dev'
+          TARGET_SPACE: ${{ env.target_space }}
+          SPLUNK_TOKEN: 'TestToken'
+          ANYPOINTMQ_CLIENT_ID: 'MQ_Client_ID'
+          ANYPOINTMQ_CLIENT_SECRET: 'MQ_Client_Secret12'
+          AP_CA_CLIENT_ID: ${{ env.AP_CA_CLIENT_ID }}
+          AP_CA_CLIENT_SECRET: ${{ env.AP_CA_CLIENT_SECRET }}
+          APP_NAME_DEPLOYMENT: ${{ env.APP_NAME }}
+          ORG_ID: ${{ env.ANYPOINT_EXCHANGE_ORG_ID }}
+        run: |
+          echo "Running deployment to $ENV environment"
+
+          if [ -z "$AP_CA_CLIENT_ID" ]; then echo "Client ID is EMPTY"; else echo "Client ID is set"; fi
+          if [ -z "$AP_CA_CLIENT_SECRET" ]; then echo "Client Secret is EMPTY"; else echo "Client Secret is set"; fi
+          if [ -z "$ORG_ID" ]; then echo "Org Id is EMPTY"; else echo "Org Id is set"; fi
+          if [ -z "$APP_NAME_DEPLOYMENT" ]; then echo "App Name is EMPTY"; else echo "App Name is set"; fi 
 
           # Move log4j2.xml to broker app resources folder
           pwd
@@ -347,5 +370,5 @@ jobs:
             --secureProperty openai.apiKey:XXXX \
             --output json)
 
-          echo "Redeploy command response: ${RAW_APP_MODIFY_JSON}"
+          echo "Redeploy command response: ${RAW_APP_MODIFY_JSON}" 
   
