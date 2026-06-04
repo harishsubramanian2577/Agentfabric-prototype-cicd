@@ -201,7 +201,7 @@ jobs:
           echo "asset_id: ${ASSET_ID}"
 
           # Reading agentic-parent-pom dependency
-          TARGET_ASSET_ID="its-agentic-parent-pom"
+          TARGET_ASSET_ID="org-agentic-parent-pom"
           RESULT=$(jq -r '.dependencies[] | select(.assetId == "'${TARGET_ASSET_ID}'") | "\(.groupId) \(.assetId) \(.version)"' dependency.json)
 
           if [ -n "$RESULT" ]; then
