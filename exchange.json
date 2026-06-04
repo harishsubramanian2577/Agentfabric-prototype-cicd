@@ -89,52 +89,52 @@
       "packaging": "zip",
       "groupId": "a19065cb-4dd4-4916-9401-bb64b169742c",
       "assetId": "customer-open-ai",
-      "version": "1.0.3"
+      "version": "1.0.0"
     },
     {
       "classifier": "agent-metadata",
       "packaging": "zip",
       "groupId": "a19065cb-4dd4-4916-9401-bb64b169742c",
       "assetId": "customer-workday-agent",
-      "version": "1.0.3"
+      "version": "1.0.0"
     },
     {
       "classifier": "agent-metadata",
       "packaging": "zip",
       "groupId": "a19065cb-4dd4-4916-9401-bb64b169742c",
       "assetId": "customer-badging-agent",
-      "version": "1.0.3"
+      "version": "1.0.0"
     },
     {
       "classifier": "agent-metadata",
       "packaging": "zip",
       "groupId": "a19065cb-4dd4-4916-9401-bb64b169742c",
       "assetId": "customer-salesforce-agent",
-      "version": "1.0.3"
+      "version": "1.0.0"
     },
     {
       "classifier": "agent-metadata",
       "packaging": "zip",
       "groupId": "a19065cb-4dd4-4916-9401-bb64b169742c",
       "assetId": "customer-zendesk-agent",
-      "version": "1.0.3"
+      "version": "1.0.0"
     },
     {
       "classifier": "agent-metadata",
       "packaging": "zip",
       "groupId": "a19065cb-4dd4-4916-9401-bb64b169742c",
       "assetId": "customer-it-agent",
-      "version": "1.0.3"
+      "version": "1.0.0"
     },
     {
       "groupId": "a19065cb-4dd4-4916-9401-bb64b169742c",
       "assetId": "customer-talent-pool-mcp",
-      "version": "1.0.3",
+      "version": "1.0.0",
       "classifier": "mcp-metadata",
       "packaging": "zip"
     }
   ],
   "groupId": "a19065cb-4dd4-4916-9401-bb64b169742c",
   "assetId": "demo-test-onboarding-agent",
-  "version": "1.0.3"
+  "version": "1.0.1"
 }

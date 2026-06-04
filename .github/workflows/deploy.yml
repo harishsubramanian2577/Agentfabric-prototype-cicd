@@ -163,7 +163,7 @@ jobs:
           TARGET_SPACE: ${{ env.target_space }}
           SPLUNK_TOKEN: 'TestToken'
           ANYPOINTMQ_CLIENT_ID: 'MQ_Client_ID'
-          ANYPOINTMQ_CLIENT_SECRET: 'MQ_Client_Secret1'
+          ANYPOINTMQ_CLIENT_SECRET: 'MQ_Client_Secret12'
           AP_CA_CLIENT_ID: ${{ env.AP_CA_CLIENT_ID }}
           AP_CA_CLIENT_SECRET: ${{ env.AP_CA_CLIENT_SECRET }}
           APP_NAME_DEPLOYMENT: ${{ env.APP_NAME }}
@@ -234,6 +234,7 @@ jobs:
           eval $DEPLOY_CMD
 
           # Move log4j2.xml to broker app resources folder
+          ls -latr
           cp -f resources/log4j2.xml target/broker-mule-app/src/main/resources/
 
           # cd into broker mule app in target folder
