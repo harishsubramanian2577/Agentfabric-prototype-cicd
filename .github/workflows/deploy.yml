@@ -238,6 +238,7 @@ jobs:
           ls -latr
           echo "cd to target and do a ls -latr..."
           cd target
+          pwd
           ls -latr
           echo "cd to broker-mule-app and do a ls -latr..."
           cd broker-mule-app
