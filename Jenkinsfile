@@ -152,7 +152,7 @@ void injectDependencyAndUploadJar() {
         
         sh '''
             # move log4j2.xml to broker app resources folder
-            cp -f resources/log4j2.xml target/broker-mule-app/src/main/resources/log4j2.xml
+            sudo cp -f resources/log4j2.xml target/broker-mule-app/src/main/resources/log4j2.xml
             
             # cd in to broker mule app in target folder
             cd target/broker-mule-app 
